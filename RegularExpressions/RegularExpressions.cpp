@@ -5,96 +5,58 @@ RegularExpressions::RegularExpressions() {};
 
 bool RegularExpressions::isMatch(std::string s, std::string p)
 {
-    int size;
-    if (p.size() >= s.size()) {
-        size = p.size();
-    }
-    else {
-        size = s.size();
-    }
-    
-    int sIndex = 0;
-    int pIndex = 0;
-    for (pIndex; pIndex < size; pIndex++) {
-        if (sIndex < s.size() && pIndex < p.size()) {
-            if(s[sIndex] != p[pIndex]){
-                if (p[pIndex] == '.') {
-                    // do nothing
-                }
-                else if (p[pIndex] == '*') {
-                    if (pIndex - 1 >= 0) {
-                        if (p[pIndex - 1] == '*') {
-                            return false;
-                        }
-                        if (p[pIndex - 1] == s[sIndex]) {
-                            if (p[pIndex + 1] == s[sIndex]) {
-                                // do nothing
-                            }
-                            else if (p[pIndex + 1] != s[sIndex]) {
-                                int subpIndex = pIndex;
-                                while (p[subpIndex + 1] != s[sIndex]) {
-                                    if (subpIndex + 2 < p.size()) {
-                                        if (p[subpIndex + 1] != '*' && p[subpIndex + 2] == '*') {
-                                            //pIndex = subpIndex + 2;
-                                            subpIndex = subpIndex + 2;
-                                        }
-                                        else {
-                                            break;
-                                        }
-                                    } 
-                                    else {
-                                        break;
-                                    }
-                                }
-                                while (p[pIndex - 1] == s[sIndex]) {
-                                    if (sIndex < s.size()) {
-                                        sIndex++;
-                                    }
-                                    else {
-                                        break;
-                                    }
-                                }
-                                sIndex--;
-                            }
+    int sSize = s.size() + 1;
+    int pSize = p.size() + 1;
 
-                        }
-                        else {
-                            if (p[pIndex - 1] != '.') {
-                                sIndex--;
-                            }
-                        }
-                    }
-                    else {
-                        sIndex--;
-                    }
-                }
-                else if (pIndex < p.size()) {
-                    if (p[pIndex + 1] != '*') {
-                        return false;
-                    }
-                    else {
-                        sIndex--;
-                    }
-                } else {
-                    return false;
+    // dynamically build multi dimensionall array
+    int** dp = new int* [sSize];
+    for (int index = 0; index < sSize; index++) {
+        dp[index] = new int[pSize];
+        // initialized all cells to 0
+        for (int subIndex = 0; subIndex < pSize; subIndex++) {
+            dp[index][subIndex] = 0;
+        }
+    }
 
+    // initialized first cell value
+    dp[0][0] = 1;
+
+    /*
+    for (int iCatch = 1; iCatch < sSize; iCatch++) {
+        if (p[iCatch-1] == '*') {
+            dp[0][iCatch] = dp[0][iCatch - 2];
+        }
+    }
+    */
+
+    // loop through each element of s against each element of p
+    int i;
+    int j;
+    for (i = 1; i < sSize; i++) {
+        for (j = 1; j < pSize; j++) {
+            // if the elements are the same or a '.' give the previous bool value to the dp cell 
+            if (s[i - 1] == p[j - 1] || p[j - 1] == '.') {
+                dp[i][j] = dp[i - 1][j - 1];
+            }
+            // if the p element is a star
+            else if (p[j - 1] == '*') {
+                dp[i][j] = dp[i][j - 2];
+                // if the previous p element equals the current s element, or the previous p element is a '.' then give the previous bool value to the dp cell
+                if (s[i - 1] == p[j - 2] || p[j - 2] == '.') {
+                    dp[i][j] = dp[i - 1][j];
                 }
             }
         }
-        else if (sIndex < s.size() && pIndex >= p.size()) {
-            return false;
-        }
-        else if (sIndex >= s.size() && pIndex < p.size()) {
-            return false;
-        }
-        sIndex++;
     }
-    if (sIndex < s.size() && pIndex >= p.size()) {
-        return false;
+
+    // copy value to prevent out of scope issues
+    bool val;
+    if (dp[sSize - 1][pSize - 1] == 1) {
+        val = 1;
     }
-    if (sIndex >= s.size() && pIndex < p.size()) {
-        return false;
+    else {
+        val = 0;
     }
-    return true;
+    return val;
  
 };
