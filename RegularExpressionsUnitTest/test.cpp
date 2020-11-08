@@ -12,4 +12,6 @@ TEST(TestCaseName, TestName) {
   EXPECT_EQ(false, reg->isMatch("abcd", "d*"));
   EXPECT_EQ(true, reg->isMatch("mississippi", "mis*is*ip*."));
   EXPECT_EQ(true, reg->isMatch("aa", "a*"));
+  EXPECT_EQ(true, reg->isMatch("aaa", "ab*a*c*a"));
+
 }

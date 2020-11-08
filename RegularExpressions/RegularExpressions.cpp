@@ -66,8 +66,8 @@ bool RegularExpressions::isMatch(std::string s, std::string p)
                     dp[i][j] = dp[i][j - 2];
                     // if the previous p element equals the current s element, or the previous p element is a '.'  
                     if (s[i - 1] == p[j - 2] || p[j - 2] == '.') {
-                        // then give the bool value one row up
-                        dp[i][j] = dp[i - 1][j];
+                        // then give the bool value one row up or two columns back (if either is true)
+                        dp[i][j] = dp[i - 1][j] || dp[i][j - 2];
                     }
                 }
             }
